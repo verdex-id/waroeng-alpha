@@ -12,3 +12,60 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// User (Chasier & Customer)
+model Chasier {
+  username    String        @id
+  full_name   String
+  password    String
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  Transaction Transaction[]
+}
+
+model Customer {
+  username    String        @id
+  full_name   String
+  description String
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  Transaction Transaction[]
+}
+
+// Product
+model Product {
+  code            String            @id
+  name            String
+  stock           Int
+  price           Int
+  supplier_price  Int
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  TransactionItem TransactionItem[]
+}
+
+// Transaction
+model Transaction {
+  id                String            @id @default(uuid())
+  chasier_username  String
+  chasier           Chasier           @relation(fields: [chasier_username], references: [username])
+  customer_username String?
+  customer          Customer?         @relation(fields: [customer_username], references: [username])
+  payment_method    String
+  qris_string       String
+  total_price       Int
+  total_accepted    Int
+  status            String
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  TransactionItem   TransactionItem[]
+}
+
+model TransactionItem {
+  id             String      @id @default(uuid())
+  transaction_id String
+  transaction    Transaction @relation(fields: [transaction_id], references: [id])
+  product_code   String
+  product        Product     @relation(fields: [product_code], references: [code])
+  quantity       Int
+}
