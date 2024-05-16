@@ -52,10 +52,10 @@ model Transaction {
   customer_username String?
   customer          Customer?         @relation(fields: [customer_username], references: [username])
   payment_method    String
-  qris_string       String
+  qris_string       String?
   total_price       Int
-  total_accepted    Int
-  status            String
+  total_accepted    Int               @default(0)
+  status            String            @default("UNPAID")
   created_at        DateTime          @default(now())
   updated_at        DateTime          @updatedAt
   TransactionItem   TransactionItem[]
