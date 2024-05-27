@@ -13,8 +13,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User (Chasier & Customer)
-model Chasier {
+// User (Cashier & Customer)
+model Cashier {
   username    String        @id
   full_name   String
   password    String
@@ -26,7 +26,7 @@ model Chasier {
 model Customer {
   username    String        @id
   full_name   String
-  description String
+  description String?
   created_at  DateTime      @default(now())
   updated_at  DateTime      @updatedAt
   Transaction Transaction[]
@@ -47,8 +47,8 @@ model Product {
 // Transaction
 model Transaction {
   id                String            @id @default(uuid())
-  chasier_username  String
-  chasier           Chasier           @relation(fields: [chasier_username], references: [username])
+  cashier_username  String
+  cashier           Cashier           @relation(fields: [cashier_username], references: [username])
   customer_username String?
   customer          Customer?         @relation(fields: [customer_username], references: [username])
   payment_method    String

@@ -10,8 +10,8 @@ export async function GET() {
 }
 
 const transactionCreateSchema = z.object({
-  chasier_username: z.string().min(3).max(50),
-  customer_username: z.string().min(3).max(50),
+  cashier_username: z.string().min(3).max(50),
+  customer_username: z.string().min(3).max(50).optional(),
   payment_method: z.string().min(3),
   total_price: z.number().min(100),
   transaction_items: z
@@ -29,16 +29,30 @@ export async function POST(request: NextRequest) {
   try {
     const transactionRequest = transactionCreateSchema.parse(body);
     const { transaction_items, ...transactionOnlyRequest } = transactionRequest;
-    const transaction = await prisma.transaction.create({
-      data: {
-        ...transactionOnlyRequest,
-        TransactionItem: {
-          createMany: {
-            data: transaction_items,
+    let transaction;
+    if (transactionRequest.customer_username) {
+      transaction = await prisma.transaction.create({
+        data: {
+          ...transactionOnlyRequest,
+          TransactionItem: {
+            createMany: {
+              data: transaction_items,
+            },
           },
         },
-      },
-    });
+      });
+    } else {
+      transaction = await prisma.transaction.create({
+        data: {
+          ...transactionOnlyRequest,
+          TransactionItem: {
+            createMany: {
+              data: transaction_items,
+            },
+          },
+        },
+      });
+    }
     return successResponse(transaction);
   } catch (err: any) {
     if (err instanceof ZodError) {
